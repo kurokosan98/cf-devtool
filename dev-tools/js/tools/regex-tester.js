@@ -4,7 +4,7 @@ export default {
   category: 'testers',
   categoryName: '测试',
   categoryIcon: '🧪',
-  icon: '.*',
+  icon: '🔍',
   description: '测试正则表达式匹配，实时高亮匹配结果',
   render() {
     return `

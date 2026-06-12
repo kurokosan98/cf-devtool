@@ -6,7 +6,7 @@ export default {
   category: 'converters',
   categoryName: '转换',
   categoryIcon: '🔄',
-  icon: 'Aa',
+  icon: '🔤',
   description: '文本大小写格式互转：驼峰、蛇形、连字符等',
   render() {
     return `

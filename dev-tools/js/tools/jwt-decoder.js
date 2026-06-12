@@ -6,7 +6,7 @@ export default {
   category: 'encoders',
   categoryName: '编解码',
   categoryIcon: '🔐',
-  icon: 'JWT',
+  icon: '🔑',
   description: '解码 JSON Web Token，查看 Header 和 Payload（不验证签名）',
   render() {
     return `

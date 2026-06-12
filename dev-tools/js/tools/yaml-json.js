@@ -6,7 +6,7 @@ export default {
   category: 'converters',
   categoryName: '转换',
   categoryIcon: '🔄',
-  icon: 'YML',
+  icon: '📄',
   description: 'YAML 与 JSON 格式互相转换',
   render() {
     return `

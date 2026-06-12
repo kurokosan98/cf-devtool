@@ -6,7 +6,7 @@ export default {
   category: 'formatters',
   categoryName: '格式化',
   categoryIcon: '📝',
-  icon: '{}',
+  icon: '📋',
   description: '格式化、验证和压缩 JSON 数据',
   render() {
     return `

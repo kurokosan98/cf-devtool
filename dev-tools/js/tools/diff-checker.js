@@ -4,7 +4,7 @@ export default {
   category: 'testers',
   categoryName: '测试',
   categoryIcon: '🧪',
-  icon: '≠',
+  icon: '📊',
   description: '对比两段文本的差异',
   render() {
     return `

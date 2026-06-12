@@ -6,7 +6,7 @@ export default {
   category: 'encoders',
   categoryName: '编解码',
   categoryIcon: '🔐',
-  icon: 'B64',
+  icon: '🔡',
   description: 'Base64 编码与解码，支持文本和文件',
   render() {
     return `

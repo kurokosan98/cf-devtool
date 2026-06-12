@@ -6,7 +6,7 @@ export default {
   category: 'generators',
   categoryName: '生成',
   categoryIcon: '⚡',
-  icon: '#️⃣',
+  icon: '🔐',
   description: '计算文本的 MD5、SHA1、SHA256、SHA512 哈希值',
   render() {
     return `

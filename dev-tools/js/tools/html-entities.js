@@ -6,7 +6,7 @@ export default {
   category: 'encoders',
   categoryName: '编解码',
   categoryIcon: '🔐',
-  icon: '&lt;',
+  icon: '🌐',
   description: 'HTML 实体编码与解码',
   render() {
     return `
