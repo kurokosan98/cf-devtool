@@ -12,9 +12,9 @@ export default {
     return `
       <div class="tool-card">
         <div class="scanner-container" style="text-align:center;">
-          <div class="scanner-view">
-            <video id="scanner-video" autoplay playsinline style="max-width:100%;border-radius:var(--radius);background:#000;"></video>
-            <canvas id="scanner-canvas" style="display:none;"></canvas>
+          <div class="scanner-view" style="position:relative;">
+            <video id="scanner-video" autoplay playsinline style="max-width:100%;border-radius:var(--radius);background:#000;display:block;"></video>
+            <canvas id="scanner-canvas" style="display:none;max-width:100%;border-radius:var(--radius);background:#000;"></canvas>
           </div>
           <div id="scanner-status" style="padding:16px;color:var(--text-muted);font-size:14px;">
             点击下方按钮启动摄像头
@@ -22,6 +22,7 @@ export default {
           <div class="btn-row" style="justify-content:center;">
             <button class="btn btn-primary" id="scanner-start">启动摄像头</button>
             <button class="btn btn-secondary" id="scanner-stop" disabled>停止</button>
+            <button class="btn btn-success" id="scanner-rescan" style="display:none;">继续扫描</button>
           </div>
         </div>
       </div>
@@ -40,6 +41,7 @@ export default {
     const status = container.querySelector('#scanner-status');
     const startBtn = container.querySelector('#scanner-start');
     const stopBtn = container.querySelector('#scanner-stop');
+    const rescanBtn = container.querySelector('#scanner-rescan');
     const resultCard = container.querySelector('#scanner-result-card');
     const resultText = container.querySelector('#scanner-result');
     const copyBtn = container.querySelector('#scanner-copy');
@@ -67,16 +69,51 @@ export default {
       const imageData = ctx.getImageData(0, 0, w, h);
       const code = jsQR(imageData.data, w, h, { inversionAttempts: 'dontInvert' });
       if (code) {
+        freezeFrame(ctx, w, h, code);
         resultText.value = code.data;
         resultCard.style.display = '';
         status.innerHTML = `<span style="color:var(--success);">&#x2713; 扫码成功！</span>`;
-        stopCamera();
+        rescanBtn.style.display = '';
+        cancelAnimationFrame(animFrame);
+        animFrame = null;
         return;
       }
       animFrame = requestAnimationFrame(processFrame);
     }
 
+    function freezeFrame(ctx, w, h, code) {
+      video.style.display = 'none';
+      canvas.style.display = 'block';
+      ctx.drawImage(video, 0, 0, w, h);
+      const loc = code.location;
+      const corners = [
+        loc.topLeftCorner, loc.topRightCorner,
+        loc.bottomRightCorner, loc.bottomLeftCorner
+      ];
+      ctx.strokeStyle = '#4ade80';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(corners[0].x, corners[0].y);
+      for (let i = 1; i < corners.length; i++) {
+        ctx.lineTo(corners[i].x, corners[i].y);
+      }
+      ctx.closePath();
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(74, 222, 128, 0.15)';
+      ctx.fill();
+      const cx = corners.reduce((s, p) => s + p.x, 0) / 4;
+      const cy = corners.reduce((s, p) => s + p.y, 0) / 4;
+      ctx.fillStyle = '#4ade80';
+      ctx.font = 'bold 18px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('QR', cx, cy - 4);
+    }
+
     async function startCamera() {
+      rescanBtn.style.display = 'none';
+      video.style.display = 'block';
+      canvas.style.display = 'none';
       try {
         stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
@@ -108,6 +145,11 @@ export default {
 
     startBtn.addEventListener('click', startCamera);
     stopBtn.addEventListener('click', () => { stopCamera(); status.textContent = '已停止扫描'; });
+    rescanBtn.addEventListener('click', () => {
+      resultCard.style.display = 'none';
+      status.textContent = '正在扫描... 将二维码对准摄像头';
+      startCamera();
+    });
 
     copyBtn.addEventListener('click', async () => {
       if (resultText.value) {
