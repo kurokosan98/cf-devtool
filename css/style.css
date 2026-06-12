@@ -819,6 +819,9 @@ body {
   object-fit: cover;
 }
 
+/* Sidebar backdrop - globally hidden, shown on mobile via media query */
+#sidebar-backdrop { display: none; }
+
 /* Utility */
 .hidden { display: none !important; }
 
