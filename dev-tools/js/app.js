@@ -17,6 +17,7 @@ async function loadAllTools() {
     './tools/lorem-ipsum.js',
     './tools/case-converter.js',
     './tools/number-base.js',
+    './tools/markdown-preview.js',
   ];
   for (const mod of toolModules) {
     try {
