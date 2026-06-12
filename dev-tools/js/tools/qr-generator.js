@@ -64,12 +64,14 @@ export default {
       try {
         canvas.width = 0;
         canvas.height = 0;
+        canvas.style.display = 'inline-block';
         QRCode.toCanvas(canvas, text, {
           width: parseInt(sizeSelect.value),
           errorCorrectionLevel: ecSelect.value,
-          margin: 2,
+          margin: 4,
           color: { dark: '#000000', light: '#ffffff' },
         }, (err) => {
+          if (err) canvas.style.display = 'none';
           if (err) {
             showToast('生成失败: ' + err.message, 'error');
             return;
