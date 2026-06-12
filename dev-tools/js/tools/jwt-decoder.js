@@ -51,8 +51,8 @@ export default {
         return;
       }
       try {
-        const header = JSON.parse(atob(parts[0]));
-        const payload = JSON.parse(atob(parts[1]));
+        const header = JSON.parse(decodeURIComponent(escape(atob(parts[0]))));
+        const payload = JSON.parse(decodeURIComponent(escape(atob(parts[1]))));
         headerEl.textContent = JSON.stringify(header, null, 2);
         payloadEl.textContent = JSON.stringify(payload, null, 2);
         sigEl.textContent = parts[2];
