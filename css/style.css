@@ -822,6 +822,10 @@ body {
 /* Sidebar backdrop - globally hidden, shown on mobile via media query */
 #sidebar-backdrop { display: none; }
 
+/* QR Scanner picker */
+.picker-item:last-child { border-bottom: none !important; }
+.picker-item:hover { background: var(--bg-tertiary); border-radius: var(--radius-sm); }
+
 /* Mobile floating menu button */
 .mobile-menu-btn {
   display: none;
