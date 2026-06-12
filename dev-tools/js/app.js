@@ -18,6 +18,7 @@ async function loadAllTools() {
     './tools/case-converter.js',
     './tools/number-base.js',
     './tools/markdown-preview.js',
+    './tools/qr-generator.js',
   ];
   for (const mod of toolModules) {
     try {
