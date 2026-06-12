@@ -101,7 +101,7 @@ export default {
 async function loadQRCodeLib() {
   if (window.QRCodeLib) return window.QRCodeLib;
   const script = document.createElement('script');
-  script.src = 'https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js';
+  script.src = 'js/lib/qrcode.min.js';
   document.head.appendChild(script);
   await new Promise((resolve, reject) => {
     script.onload = resolve;
