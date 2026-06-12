@@ -92,6 +92,8 @@ async function activateTool(id) {
     document.getElementById('sidebar').classList.remove('open');
     const backdrop = document.getElementById('sidebar-backdrop');
     if (backdrop) backdrop.classList.remove('open');
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    if (menuBtn) menuBtn.classList.remove('hidden');
   }
 }
 
@@ -107,16 +109,19 @@ function setupSearch() {
 function setupSidebarToggle() {
   const sidebar = document.getElementById('sidebar');
   const backdrop = document.getElementById('sidebar-backdrop');
+  const menuBtn = document.getElementById('mobile-menu-btn');
   const openSidebar = () => {
-    sidebar.classList.toggle('open');
+    const opened = sidebar.classList.toggle('open');
     if (backdrop) backdrop.classList.toggle('open');
+    if (menuBtn) menuBtn.classList.toggle('hidden', opened);
   };
   document.getElementById('sidebar-toggle').addEventListener('click', openSidebar);
-  document.getElementById('mobile-menu-btn').addEventListener('click', openSidebar);
+  if (menuBtn) menuBtn.addEventListener('click', openSidebar);
   if (backdrop) {
     backdrop.addEventListener('click', () => {
       sidebar.classList.remove('open');
       backdrop.classList.remove('open');
+      if (menuBtn) menuBtn.classList.remove('hidden');
     });
   }
 }
