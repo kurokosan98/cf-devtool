@@ -1,7 +1,9 @@
 export const tools = [];
 export const categories = {};
+const toolModules = {};
 
 export function registerTool(tool) {
+  if (getTool(tool.id)) return;
   tools.push(tool);
   if (!categories[tool.category]) {
     categories[tool.category] = { name: tool.categoryName, icon: tool.categoryIcon, tools: [] };
@@ -13,8 +15,24 @@ export function getTool(id) {
   return tools.find(t => t.id === id);
 }
 
-export function getToolsByCategory(category) {
-  return categories[category]?.tools || [];
+export function registerStatic(id, name, category, categoryName, categoryIcon, icon, description, modulePath) {
+  registerTool({
+    id, name, category, categoryName, categoryIcon, icon, description,
+    _modulePath: modulePath,
+    render() { return '<div class="tool-loading" style="text-align:center;padding:40px;color:var(--text-muted);">加载中...</div>'; },
+    init() {},
+  });
+  toolModules[id] = modulePath;
+}
+
+export async function loadTool(id) {
+  const tool = getTool(id);
+  if (!tool || !tool._modulePath) return;
+  const mod = await import(tool._modulePath);
+  if (mod.default) {
+    Object.assign(tool, mod.default);
+    delete tool._modulePath;
+  }
 }
 
 const categoryOrder = ['converters', 'generators', 'formatters', 'testers', 'encoders'];

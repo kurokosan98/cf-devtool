@@ -156,6 +156,7 @@ const QR = (() => {
 
   function makeMatrix(ver, ecIdx, data) {
     const vi = VINFO[ver];
+    if (!vi) return Array.from({ length: 21 }, () => Array(21).fill(0));
     const s = vi.s;
     const M = Array.from({ length: s }, () => Array(s).fill(-1));
     const set = (r, c, v) => { if (r >= 0 && r < s && c >= 0 && c < s && M[r][c] < 0) M[r][c] = v; };
@@ -215,7 +216,9 @@ const QR = (() => {
   ];
 
   function apply(M, ver, mi) {
-    const s = VINFO[ver].s, fn = FMASKS[mi];
+    const vi = VINFO[ver];
+    if (!vi) return;
+    const s = vi.s, fn = FMASKS[mi];
     for (let r = 0; r < s; r++)
       for (let c = 0; c < s; c++)
         if (fn(r, c)) M[r][c] ^= 1;
@@ -285,12 +288,14 @@ const QR = (() => {
     let ver = 1;
     while (ver <= 40) {
       const vi = VINFO[ver];
-      const cap = vi.g.reduce((s, g) => s + g.n * g.d, 0);
+      if (!vi) { ver++; continue; }
+      const cap = vi.g ? vi.g.reduce((s, g) => s + g.n * g.d, 0) : 0;
       if (raw.length <= cap) break;
       ver++;
     }
     if (ver > 40) return null;
     const vi = VINFO[ver];
+    if (!vi || !vi.g) return null;
     const cap = vi.g.reduce((s, g) => s + g.n * g.d, 0);
     while (raw.length < cap) raw.push(raw.length % 2 === 0 ? 0xec : 0x11);
     const interleaved = interleave(raw.slice(0, cap), ver, ei);
@@ -304,7 +309,7 @@ const QR = (() => {
       const s = score(M, ver);
       if (s < bestS) { bestS = s; bestM = M.map(r => [...r]); }
     }
-    return { matrix: bestM, version: ver, size: vi.s };
+    return { matrix: bestM, version: ver, size: VINFO[ver] ? VINFO[ver].s : 0 };
   }
 
   return { generate };
