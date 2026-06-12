@@ -107,10 +107,12 @@ function setupSearch() {
 function setupSidebarToggle() {
   const sidebar = document.getElementById('sidebar');
   const backdrop = document.getElementById('sidebar-backdrop');
-  document.getElementById('sidebar-toggle').addEventListener('click', () => {
+  const openSidebar = () => {
     sidebar.classList.toggle('open');
     if (backdrop) backdrop.classList.toggle('open');
-  });
+  };
+  document.getElementById('sidebar-toggle').addEventListener('click', openSidebar);
+  document.getElementById('mobile-menu-btn').addEventListener('click', openSidebar);
   if (backdrop) {
     backdrop.addEventListener('click', () => {
       sidebar.classList.remove('open');

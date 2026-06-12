@@ -883,6 +883,10 @@ body {
   .scanner-view {
     max-width: 100%;
   }
+
+  .mobile-menu-btn {
+    display: flex;
+  }
 }
 
 /* Utility */
