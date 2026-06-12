@@ -1,4 +1,3 @@
-import QR from '../lib/qrcode.js';
 import { showToast } from '../app.js';
 
 export default {
@@ -25,7 +24,7 @@ export default {
             </select>
           </div>
           <div>
-            <label>尺寸 (px)</label>
+            <label>尺寸</label>
             <select id="qr-size" class="tool-select">
               <option value="160">160</option>
               <option value="240" selected>240</option>
@@ -47,68 +46,40 @@ export default {
           </div>
         </div>
       </div>
-      <div class="tool-card" id="qr-info-card" style="display:none;">
-        <div style="display:flex;gap:16px;font-size:13px;color:var(--text-secondary);flex-wrap:wrap;">
-          <span id="qr-ver-info"></span>
-          <span id="qr-size-info"></span>
-          <span id="qr-ec-info"></span>
-        </div>
-      </div>
     `;
   },
-  init(container) {
+  async init(container) {
     const input = container.querySelector('#qr-input');
     const canvas = container.querySelector('#qr-canvas');
     const placeholder = container.querySelector('#qr-placeholder');
     const ecSelect = container.querySelector('#qr-ec');
     const sizeSelect = container.querySelector('#qr-size');
-    const infoCard = container.querySelector('#qr-info-card');
-    const verInfo = container.querySelector('#qr-ver-info');
-    const sizeInfo = container.querySelector('#qr-size-info');
-    const ecInfo = container.querySelector('#qr-ec-info');
 
-    const inputDisplay = container.querySelector('#qr-input-display');
+    const QRCode = await loadQRCodeLib();
 
     function generate() {
       const text = input.value.trim();
       if (!text) { showToast('请输入内容', 'error'); return; }
 
-      const ecLevel = ecSelect.value;
-      const pixelSize = parseInt(sizeSelect.value);
-
-      const result = QR.generate(text, ecLevel);
-      if (!result) {
-        showToast('内容太长，请缩短文本', 'error');
-        return;
-      }
-
-      const { matrix, version, size } = result;
-      const moduleSize = Math.floor(pixelSize / size);
-      const actualSize = moduleSize * size;
-      const offset = Math.floor((pixelSize - actualSize) / 2);
-
-      canvas.width = pixelSize;
-      canvas.height = pixelSize;
-      canvas.style.display = 'inline-block';
-      placeholder.style.display = 'none';
-
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, pixelSize, pixelSize);
-
-      ctx.fillStyle = '#000000';
-      for (let r = 0; r < size; r++) {
-        for (let c = 0; c < size; c++) {
-          if (matrix[r][c]) {
-            ctx.fillRect(offset + c * moduleSize, offset + r * moduleSize, moduleSize, moduleSize);
+      try {
+        canvas.width = 0;
+        canvas.height = 0;
+        QRCode.toCanvas(canvas, text, {
+          width: parseInt(sizeSelect.value),
+          errorCorrectionLevel: ecSelect.value,
+          margin: 2,
+          color: { dark: '#000000', light: '#ffffff' },
+        }, (err) => {
+          if (err) {
+            showToast('生成失败: ' + err.message, 'error');
+            return;
           }
-        }
+          canvas.style.display = 'inline-block';
+          placeholder.style.display = 'none';
+        });
+      } catch (e) {
+        showToast('生成失败: ' + e.message, 'error');
       }
-
-      infoCard.style.display = 'block';
-      verInfo.textContent = `版本: ${version}`;
-      sizeInfo.textContent = `矩阵: ${size}×${size}`;
-      ecInfo.textContent = `容错: ${ecLevel}`;
     }
 
     container.querySelector('#qr-generate').addEventListener('click', generate);
@@ -119,9 +90,21 @@ export default {
       link.href = canvas.toDataURL('image/png');
       link.click();
     });
-
     input.addEventListener('keydown', e => {
       if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) generate();
     });
   }
 };
+
+async function loadQRCodeLib() {
+  if (window.QRCodeLib) return window.QRCodeLib;
+  const script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js';
+  document.head.appendChild(script);
+  await new Promise((resolve, reject) => {
+    script.onload = resolve;
+    script.onerror = () => reject(new Error('QR 库加载失败'));
+  });
+  window.QRCodeLib = { toCanvas: window.QRCode.toCanvas };
+  return window.QRCodeLib;
+}
